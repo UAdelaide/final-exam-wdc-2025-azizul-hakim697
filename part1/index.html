@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog of the Day</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      background-color: pink; /* changed from yellow to pink */
+      color: red;
+      font-size: 22px;
+      font-family: cursive;
+    }
+
+    button {
+      margin: 50px;
+      padding: 20px;
+      background-color: lime;
+      font-weight: bold;
+    }
+
+    img {
+      width: 90%;
+      border: 5px solid red;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>DOG PICTURE!</h1>
+    <button @click="getDog">Show Dog</button>
+    <p>{{ breedName }}</p>
+    <img :src="dogUrl">
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          dogUrl: '',
+          breedName: 'Best dog ever!'
+        };
+      },
+      methods: {
+        getDog() {
+          fetch('https://dog.ceo/api/breeds/image/random')
+            .then(res => res.json())
+            .then(data => {
+              this.dogUrl = data.message;
+            });
+        }
+      },
+      mounted() {
+        this.getDog();
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
