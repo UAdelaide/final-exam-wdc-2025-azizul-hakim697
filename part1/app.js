@@ -17,7 +17,7 @@ let db;
   try {
     // Step 1: Create the database
     const rootConn = await mysql.createConnection({
-      host: 'localhost',
+      host: '127.0.0.1',
       user: 'root',
       password: ''
     });
@@ -26,7 +26,7 @@ let db;
 
     // Step 2: Connect to the database
     db = await mysql.createConnection({
-      host: 'localhost',
+      host: '127.0.0.1',
       user: 'root',
       password: '',
       database: 'dogwalkdb'
