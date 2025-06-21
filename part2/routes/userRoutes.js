@@ -1,4 +1,3 @@
-// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
 
@@ -18,6 +17,10 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
+
+    // ✅ Store user in session
+    req.session.user = user;
+
     res.json({ message: 'Login successful', user });
   } catch (error) {
     console.error('Login error:', error);
@@ -43,7 +46,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// GET /api/users - list all users
+// GET /api/users
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
   try {
@@ -54,12 +57,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/users/dogs - get dogs for the logged-in owner
+// ✅ GET /api/users/dogs (fetch dogs owned by logged-in user)
 router.get('/dogs', async (req, res) => {
   const db = req.app.locals.db;
+  const ownerId = req.session?.user?.user_id;
 
-  // Simulated logged-in user ID — replace this with session logic if needed
-  const ownerId = 6;
+  if (!ownerId) {
+    return res.status(401).json({ error: 'Unauthorized: No session' });
+  }
 
   try {
     const [rows] = await db.query(
@@ -69,8 +74,4 @@ router.get('/dogs', async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error('Failed to fetch dogs for owner:', error);
-    res.status(500).json({ error: 'Failed to load dogs' });
-  }
-});
-
-module.exports = router;
+    res.status(500).json({ error: '
