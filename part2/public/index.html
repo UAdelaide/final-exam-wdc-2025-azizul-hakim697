@@ -1,17 +1,70 @@
-<!-- public/login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f4f7fa;
+    }
+
+    #app {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #1e90ff;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-top: 20px;
+      color: red;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
     <h2>Login</h2>
     <form @submit.prevent="login">
-      <label>Username: <input v-model="username" required></label><br>
-      <label>Password: <input v-model="password" type="password" required></label><br>
+      <label>Username:
+        <input v-model="username" required />
+      </label>
+      <label>Password:
+        <input v-model="password" type="password" required />
+      </label>
       <button type="submit">Login</button>
     </form>
     <p>{{ message }}</p>
@@ -31,14 +84,27 @@
         async login() {
           const res = await fetch('/api/users/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: this.username, password: this.password })
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              username: this.username,
+              password: this.password
+            })
           });
+
           const data = await res.json();
+
           if (res.ok) {
-            this.message = `Welcome ${data.user.username} (${data.user.role})`;
+            if (data.user.role === 'owner') {
+              window.location.href = '/owner-dashboard.html';
+            } else if (data.user.role === 'walker') {
+              window.location.href = '/walker-dashboard.html';
+            } else {
+              this.message = `Unknown role: ${data.user.role}`;
+            }
           } else {
-            this.message = data.error;
+            this.message = data.error || 'Login failed';
           }
         }
       }
