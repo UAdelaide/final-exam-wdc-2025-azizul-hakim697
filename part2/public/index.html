@@ -1,79 +1,48 @@
+<!-- public/login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dog Walking Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Login</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <style>
-    body {
-      background: #e7f1fa; /* soft blue background */
-    }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    }
-    .form-control {
-      background-color: #f0f8ff; /* alice blue */
-      border: 1px solid #bcd4e6;
-    }
-    .form-control:focus {
-      border-color: #5c9bd1;
-      box-shadow: 0 0 0 0.2rem rgba(92, 155, 209, 0.25);
-    }
-    .btn-primary {
-      background-color: #5c9bd1;
-      border-color: #5c9bd1;
-    }
-    .btn-primary:hover {
-      background-color: #478acb;
-    }
-  </style>
 </head>
 <body>
-
-<div id="app" class="container d-flex justify-content-center align-items-center min-vh-100">
-  <div class="card p-4" style="max-width: 400px; width: 100%;">
-    <h3 class="text-center text-primary mb-3">{{ title }}</h3>
-
+  <div id="app">
+    <h2>Login</h2>
     <form @submit.prevent="login">
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" id="username" v-model="username" class="form-control" placeholder="Enter your username">
-      </div>
-
-      <div class="mb-4">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" id="password" v-model="password" class="form-control" placeholder="Enter your password">
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">Log In</button>
+      <label>Username: <input v-model="username" required></label><br>
+      <label>Password: <input v-model="password" type="password" required></label><br>
+      <button type="submit">Login</button>
     </form>
+    <p>{{ message }}</p>
   </div>
-</div>
 
-<script>
-  const { createApp } = Vue;
-
-  createApp({
-    data() {
-      return {
-        title: 'Welcome to the Dog Walking Service!',
-        username: '',
-        password: ''
-      };
-    },
-    methods: {
-      login() {
-        alert(`Logging in as ${this.username}`);
-        // Real login logic can go here
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          username: '',
+          password: '',
+          message: ''
+        };
+      },
+      methods: {
+        async login() {
+          const res = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: this.username, password: this.password })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            this.message = `Welcome ${data.user.username} (${data.user.role})`;
+          } else {
+            this.message = data.error;
+          }
+        }
       }
-    }
-  }).mount('#app');
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    }).mount('#app');
+  </script>
 </body>
 </html>
