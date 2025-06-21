@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-// Use db from app.locals
+// POST /login
 router.post('/login', async (req, res) => {
   const db = req.app.locals.db;
   const { username, password } = req.body;
@@ -18,7 +18,6 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
-    // Respond with user info (no redirect here; handled by frontend)
     res.json({ message: 'Login successful', user });
   } catch (error) {
     console.error('Login error:', error);
@@ -26,6 +25,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// POST /register
 router.post('/register', async (req, res) => {
   const db = req.app.locals.db;
   const { username, email, password, role } = req.body;
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Optional: View all users
+// GET /api/users - list all users
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
   try {
@@ -51,6 +51,25 @@ router.get('/', async (req, res) => {
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// GET /api/users/dogs - get dogs for the logged-in owner
+router.get('/dogs', async (req, res) => {
+  const db = req.app.locals.db;
+
+  // Simulated logged-in user ID — replace this with session logic if needed
+  const ownerId = 6;
+
+  try {
+    const [rows] = await db.query(
+      'SELECT dog_id, name FROM dogs WHERE owner_id = ?',
+      [ownerId]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Failed to fetch dogs for owner:', error);
+    res.status(500).json({ error: 'Failed to load dogs' });
   }
 });
 
