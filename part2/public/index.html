@@ -9,7 +9,7 @@
 <body>
   <div id="app">
     <h2>Login</h2>
-    <form @submit.prevent="/api/users/login">
+    <form @submit.prevent="/">
       <label>Username: <input v-model="username" required></label><br>
       <label>Password: <input v-model="password" type="password" required></label><br>
       <button type="submit">Login</button>
