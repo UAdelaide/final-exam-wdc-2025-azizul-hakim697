@@ -5,7 +5,7 @@ const db = require('../models/db');
 // GET all users (for admin/testing)
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT user_id, username, email, role FROM Users');
+    const [rows] = await db.query('SELECT user_id, username, email, role FROM users');
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users' });
@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
 
   try {
     const [result] = await db.query(`
-      INSERT INTO Users (username, email, password_hash, role)
+      INSERT INTO users (username, email, password_hash, role)
       VALUES (?, ?, ?, ?)
     `, [username, email, password, role]);
 
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const [rows] = await db.query(`
-      SELECT user_id, username, role FROM Users
+      SELECT user_id, username, role FROM users
       WHERE email = ? AND password_hash = ?
     `, [email, password]);
 
