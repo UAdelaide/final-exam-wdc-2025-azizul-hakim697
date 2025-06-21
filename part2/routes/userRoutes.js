@@ -1,3 +1,4 @@
+// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
 
@@ -17,10 +18,7 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
-
-    // ✅ Store user in session
-    req.session.user = user;
-
+    req.session.user = user; // Store in session
     res.json({ message: 'Login successful', user });
   } catch (error) {
     console.error('Login error:', error);
@@ -46,7 +44,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// GET /api/users
+// GET /api/users - list all users
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
   try {
@@ -57,7 +55,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ GET /api/users/dogs (fetch dogs owned by logged-in user)
+// GET /api/users/dogs - fetch dogs owned by logged-in user
 router.get('/dogs', async (req, res) => {
   const db = req.app.locals.db;
   const ownerId = req.session?.user?.user_id;
