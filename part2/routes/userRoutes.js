@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-// POST login
+// Use db from app.locals
 router.post('/login', async (req, res) => {
   const db = req.app.locals.db;
   const { username, password } = req.body;
@@ -18,12 +18,7 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
-    req.session.user = {
-      id: user.user_id,
-      username: user.username,
-      role: user.role
-    };
-
+    // Respond with user info (no redirect here; handled by frontend)
     res.json({ message: 'Login successful', user });
   } catch (error) {
     console.error('Login error:', error);
@@ -31,7 +26,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST register
 router.post('/register', async (req, res) => {
   const db = req.app.locals.db;
   const { username, email, password, role } = req.body;
@@ -49,7 +43,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// GET all users (admin/testing)
+// Optional: View all users
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
   try {
@@ -57,27 +51,6 @@ router.get('/', async (req, res) => {
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
-
-// GET /api/users/dogs — Get current owner's dogs
-router.get('/dogs', async (req, res) => {
-  const db = req.app.locals.db;
-  const ownerId = req.session?.user?.id;
-
-  if (!ownerId) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  try {
-    const [rows] = await db.query(
-      `SELECT dog_id, name FROM dogs WHERE owner_id = ?`,
-      [ownerId]
-    );
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching dogs:', error.message);
-    res.status(500).json({ error: 'Failed to fetch dogs' });
   }
 });
 
