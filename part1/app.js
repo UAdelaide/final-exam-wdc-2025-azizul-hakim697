@@ -148,7 +148,7 @@ app.get('/api/walkers/summary', async (req, res) => {
   }
 });
 
-// Public folder (optional)
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Start server
