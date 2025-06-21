@@ -53,6 +53,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
 // Optional route to get session user info
 router.get('/me', (req, res) => {
   if (!req.session || !req.session.user) {
