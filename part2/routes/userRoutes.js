@@ -74,4 +74,8 @@ router.get('/dogs', async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error('Failed to fetch dogs for owner:', error);
-    res.status(500).json({ error: '
+    res.status(500).json({ error: 'Failed to load dogs' });
+  }
+});
+
+module.exports = router;
