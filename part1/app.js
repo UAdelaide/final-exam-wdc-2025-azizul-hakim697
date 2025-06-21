@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const logger = require('morgan');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const fs = require('fs');
 
 const app = express();
 app.use(logger('dev'));
@@ -15,7 +16,6 @@ let db;
 
 (async () => {
   try {
-    // Step 1: Create the database
     const rootConn = await mysql.createConnection({
       host: '127.0.0.1',
       user: 'root',
@@ -24,7 +24,6 @@ let db;
     await rootConn.query('CREATE DATABASE IF NOT EXISTS dogwalkdb');
     await rootConn.end();
 
-    // Step 2: Connect to the database
     db = await mysql.createConnection({
       host: '127.0.0.1',
       user: 'root',
@@ -32,7 +31,6 @@ let db;
       database: 'dogwalkdb'
     });
 
-    // Step 3: Create tables if not exist
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,7 +78,6 @@ let db;
       );
     `);
 
-    // Step 4: Seed data only if users table is empty
     const [[{ count }]] = await db.query('SELECT COUNT(*) AS count FROM users');
     if (count === 0) {
       await db.query(`INSERT INTO users (username) VALUES ('alice123'), ('carol123');`);
@@ -100,7 +97,19 @@ let db;
   }
 })();
 
-// API 1: /api/dogs
+// Serve index.html directly (since it's in the part1 folder)
+app.get('/', (req, res) => {
+  const filePath = path.join(__dirname, 'index.html');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).send('Error loading index.html');
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+// /api/dogs route
 app.get('/api/dogs', async (req, res) => {
   try {
     const [rows] = await db.execute(`
@@ -114,7 +123,7 @@ app.get('/api/dogs', async (req, res) => {
   }
 });
 
-// API 2: /api/walkrequests/open
+// /api/walkrequests/open route
 app.get('/api/walkrequests/open', async (req, res) => {
   try {
     const [rows] = await db.execute(`
@@ -130,7 +139,7 @@ app.get('/api/walkrequests/open', async (req, res) => {
   }
 });
 
-// API 3: /api/walkers/summary
+// /api/walkers/summary route
 app.get('/api/walkers/summary', async (req, res) => {
   try {
     const [rows] = await db.execute(`
@@ -147,9 +156,6 @@ app.get('/api/walkers/summary', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch walker summary' });
   }
 });
-
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Start server
 const PORT = process.env.PORT || 3000;
