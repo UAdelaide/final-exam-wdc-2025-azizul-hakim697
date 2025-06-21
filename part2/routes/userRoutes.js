@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Optional: View all users (testing)
+// Optional: View all users 
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
   try {
